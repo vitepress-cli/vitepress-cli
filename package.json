@@ -1,0 +1,14 @@
+{
+  "name": "vitepress-cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": {
+    "vitepress-cli": "./bin/index.js"
+  },
+  "repository": "https://github.com/Asaki-M/vitepress-cli.git",
+  "author": "Qinghuan <1041220793@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^9.2.0"
+  }
+}
