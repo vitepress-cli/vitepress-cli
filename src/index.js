@@ -12,7 +12,7 @@ Reflect.ownKeys(mapActions).forEach((action) => {
         // cannot find command output this tip
         console.log(mapActions[action].description)
       } else {
-        require('./create.js')
+        require('./create.js')(...process.argv.slice(3))
       }
     })
 })
