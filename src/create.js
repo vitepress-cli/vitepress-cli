@@ -1,5 +1,6 @@
 const inquirer = require('inquirer')
 const fetch = require('node-fetch')
+const chalk = require('chalk')
 const fs = require('fs')
 const download = require('download-git-repo')
 const { loadingByOra } = require('../utils/common')
@@ -12,7 +13,9 @@ const fetchRepoList = () => {
     fetch('https://api.github.com/orgs/vitepress-cli/repos')
       .then((r) => r.json())
       .then((data) => {
-        const repos = data.map((item) => item.name)
+        const repos = data
+          .map((item) => item.name)
+          .filter((name) => name !== 'vitepress-cli')
         resolve(repos)
       })
       .catch((e) => {
@@ -53,15 +56,81 @@ const createDir = (name) => {
 }
 
 module.exports = async (projectName) => {
-  const repos = await loadingByOra(fetchRepoList, 'loading template...')
-  const { repo } = await inquirer.prompt([
-    {
-      type: 'list',
-      name: 'repo',
-      message: 'select a template to create your project',
-      choices: repos
+  if (fs.existsSync(projectName)) {
+    console.log(
+      chalk.rgb(
+        166,
+        27,
+        41
+      )(
+        `
+        ${projectName} already exists, please rename the project name or delete the existed directory.
+        `
+      )
+    )
+    return
+  }
+
+  const repos = await loadingByOra(fetchRepoList, {
+    loading: 'loading template...',
+    done: 'Template loaded'
+  })
+  if (repos !== null) {
+    const { repo } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'repo',
+        message: 'select a template to create your project',
+        choices: repos
+      }
+    ])
+    await createDir(projectName)
+    const downloaded = await loadingByOra(
+      downloadRepo,
+      {
+        loading: 'downloading template...',
+        done: 'Template download complete'
+      },
+      repo,
+      projectName
+    )
+    if (downloaded !== null) {
+      succeedLog(projectName)
     }
-  ])
-  await createDir(projectName)
-  await loadingByOra(downloadRepo, 'downloading template...', repo, projectName)
+  }
+}
+
+/**
+ * log information when download complete
+ */
+function succeedLog(projectName) {
+  console.log(
+    chalk.rgb(
+      93,
+      190,
+      138
+    )('----------------------------------------------------------------')
+  )
+  console.log(
+    chalk.rgb(
+      92,
+      179,
+      204
+    )(
+      `
+      cd ${projectName}
+
+      yarn or npm install
+
+      yarn docs:dev or npm run docs:dev
+      `
+    )
+  )
+  console.log(
+    chalk.rgb(
+      93,
+      190,
+      138
+    )('----------------------------------------------------------------')
+  )
 }

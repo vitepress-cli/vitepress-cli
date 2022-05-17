@@ -1,10 +1,17 @@
 const ora = require('ora')
 
 const loadingByOra = async (fn, message, ...args) => {
-  const spinner = ora(message)
+  const spinner = ora(message.loading)
   spinner.start()
-  let result = await fn(...args)
-  spinner.succeed()
+  let result = null
+  try {
+    result = await fn(...args)
+    spinner.succeed(message.done)
+  } catch (error) {
+    spinner.fail(
+      'failed to create, can new Issure to https://github.com/vitepress-cli/vitepress-cli'
+    )
+  }
   return result
 }
 

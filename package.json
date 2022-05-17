@@ -9,6 +9,7 @@
   "author": "Qinghuan <1041220793@qq.com>",
   "license": "MIT",
   "dependencies": {
+    "chalk": "4",
     "commander": "^9.2.0",
     "download-git-repo": "^3.0.2",
     "inquirer": "^8.2.4",
